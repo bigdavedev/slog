@@ -1,17 +1,9 @@
 cmake_minimum_required (VERSION 3.5)
 
-option (SLOG_BUILD_SHARED_LIBRARY ON)
-
 # Simple Logger
-project (slog C)
+project (slog VERSION 0.1.0 LANGUAGES C)
 
-set (TARGET ${PROJECT_NAME} CACHE INTERNAL "")
-
-if (SLOG_BUILD_SHARED_LIBRARY)
-	add_library (${TARGET} SHARED "")
-else ()
-	add_library (${TARGET} "")
-endif ()
+add_library (slog source/logger.c)
 
 if (UNIX AND NOT APPLE)
 	set(THREADS_PREFER_PTHREAD_FLAG ON CACHE INTERNAL "")
@@ -19,32 +11,37 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 target_compile_definitions (
-	${TARGET}
+	${PROJECT_NAME}
 
-	PUBLIC
+	PRIVATE
 	__STDC_WANT_LIB_EXT1__=1
 )
 
-target_compile_options (
-	${TARGET}
+target_compile_features (
+	${PROJECT_NAME}
 
 	PUBLIC
-	$<$<C_COMPILER_ID:GNU>:-std=c11>
-	$<$<C_COMPILER_ID:Clang>:-std=c11>
+	$<BUILD_INTERFACE:c_variadic_macros>
+	$<INSTALL_INTERFACE:c_variadic_macros>
+)
+
+set_target_properties (
+	${PROJECT_NAME}
+	PROPERTIES
+		C_EXTENSIONS OFF
 )
 
 target_include_directories (
-	${TARGET}
+	${PROJECT_NAME}
 	
 	PUBLIC
 	${CMAKE_SOURCE_DIR}/include
 )
 
 target_sources (
-	${TARGET}
+	${PROJECT_NAME}
 
 	PRIVATE
-	${CMAKE_SOURCE_DIR}/source/logger.c
 	$<$<PLATFORM_ID:Windows>:${CMAKE_SOURCE_DIR}/source/logger_threads_windows.c>
 	$<$<PLATFORM_ID:Linux>:${CMAKE_SOURCE_DIR}/source/logger_threads_unix.c>
 	
@@ -54,8 +51,8 @@ target_sources (
 )
 
 target_link_libraries (
-	${TARGET}
+	${PROJECT_NAME}
 
-	PUBLIC
+	PRIVATE
 	$<$<PLATFORM_ID:Linux>:Threads::Threads>
 )

@@ -3,16 +3,25 @@
 
 #include <stdio.h>
 
-#ifdef WIN32
-#if SLOG_BUILD_SHARED_LIBRARY
-#define SLOG_API __declspec(dllexport)
+#ifdef SLOG_STATIC_DEFINE
+#  define SLOG_API
+#  define SLOG_NO_EXPORT
 #else
-#define SLOG_API __declspec(dllimport)
-#endif
-#elif defined(__GNUC__) && defined(SLOG_BUILD_SHARED_LIBRARY)
-#define SLOG_API __attribute__((visibility("default")))
-#else
-#define SLOG_API
+#  ifndef SLOG_API
+#    ifdef slog_EXPORTS
+#      ifdef WIN32
+#        define SLOG_API __declspec(dllexport)
+#      else
+#        define SLOG_API __attribute__((visibility("default")))
+#      endif
+#    else
+#      ifdef WIN32
+#        define SLOG_API __declspec(import)
+#      else
+#        define SLOG_API __attribute__((visibility("default")))
+#      endif
+#    endif
+#  endif
 #endif
 
 struct logger;
@@ -36,6 +45,9 @@ enum logger_buffer_size
 
 	LOGGER_BUFFER_DEFAULT = LOGGER_BUFFER_NOTHING
 };
+
+SLOG_API struct logger* logger_open_log_file(char const*             filename,
+                                             enum logger_buffer_size buffer_size);
 
 SLOG_API struct logger* logger_open_log_console(FILE*                   console_handle,
                                                 enum logger_buffer_size buffer_size);
