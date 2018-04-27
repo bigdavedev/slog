@@ -47,10 +47,14 @@ target_sources (
 
 	PRIVATE
 	$<$<PLATFORM_ID:Windows>:${CMAKE_SOURCE_DIR}/source/slog_threads_windows.c>
-	$<$<PLATFORM_ID:Linux>:${CMAKE_SOURCE_DIR}/source/slog_threads_unix.c>
+	$<$<PLATFORM_ID:Linux>:
+		${CMAKE_SOURCE_DIR}/source/slog_threads_unix.c
+		${CMAKE_SOURCE_DIR}/source/slog_file_unix.c>
 	
 	PRIVATE
 	${CMAKE_SOURCE_DIR}/include/slog/slog.h
+	${CMAKE_SOURCE_DIR}/include/slog/slog_api.h
+	${CMAKE_SOURCE_DIR}/include/slog_file.h
 	${CMAKE_SOURCE_DIR}/include/slog_threads.h
 )
 
